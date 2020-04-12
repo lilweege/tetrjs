@@ -1,56 +1,75 @@
 class Tetromino {
   constructor(piece) {
     this.piece = piece;
+
+    switch (this.piece) {
+      case 0:
+        this.color = [0, 255, 255];
+        break;
+      case 1:
+        this.color = [255, 255, 0];
+        break;
+      case 2:
+        this.color = [255, 0, 255];
+        break;
+      case 3:
+        this.color = [0, 0, 255];
+        break;
+      case 4:
+        this.color = [255, 127, 0];
+        break;
+      case 5:
+        this.color = [0, 255, 0];
+        break;
+      case 6:
+        this.color = [255, 0, 0];
+        break;
+    }
+
     this.x = 4;
-    this.y = -1;
-    this.rot = 0;
+    this.y = 0;
     this.blocks = [];
-    // this.rotate(0);
+    this.rot = 0;
+    this.rotate(0);
   }
 
-  isWall(x, y) {
-    return false;
-    for (let block in this.blocks) {
+  tryPlace(x, y) {
+    for (let block of this.blocks) {
       let nx = x + block[0];
       let ny = y + block[1];
-      if (nx < 0 || nx >= w) {
+      if (ny > h - 1 || board[nx][ny]) {
+        place();
         return true;
       }
     }
     return false;
   }
 
-  move(dx, dy) {
-    if (!this.isWall(this.x + dx, this.y + dy)) {
-      this.x += dx;
-      this.y += dy;
+  isWall(x, y) {
+    for (let block of this.blocks) {
+      let nx = x + block[0];
+      let ny = y + block[1];
+      if (nx < 0 || nx >= w || board[nx][ny]) {
+        return true;
+      }
     }
+    return false;
+  }
+
+  hardDrop() {
+    while (!this.tryPlace(this.x, this.y + 1)) this.y++;
+  }
+
+  drop() {
+    if (!this.tryPlace(this.x, this.y + 1)) this.y++;
+  }
+
+  move(dx) {
+    if (!this.isWall(this.x + dx, this.y)) this.x += dx;
   }
 
   draw() {
-    switch (this.piece) {
-      case 0:
-        fill(0, 255, 255);
-        break;
-      case 1:
-        fill(255, 255, 0);
-        break;
-      case 2:
-        fill(255, 0, 255);
-        break;
-      case 3:
-        fill(0, 0, 255);
-        break;
-      case 4:
-        fill(255, 127, 0);
-        break;
-      case 5:
-        fill(0, 255, 0);
-        break;
-      case 6:
-        fill(255, 0, 0);
-        break;
-    }
+    fill(this.color[0], this.color[1], this.color[2]);
     for (let block of this.blocks) {
       rect((this.x + block[0]) * scl, (this.y + block[1]) * scl, scl, scl);
     }
@@ -59,8 +78,7 @@ class Tetromino {
   rotate(dir) {
     let pr = this.rot;
     let pb = this.blocks;
-    this.rot += dir;
-    this.rot %= 4;
+    this.rot = ((this.rot + dir) % 4 + 4) % 4
 
     switch (this.piece) {
       case 0:
@@ -257,6 +275,10 @@ class Tetromino {
           ];
         }
         break;
+    }
+    if (this.isWall(this.x, this.y)) {
+      this.rot = pr;
+      this.blocks = pb;
     }
   }
 }
