@@ -21,6 +21,7 @@ function place() {
 	if (queuedPieces.length == 0)
 		queuedPieces = queuePieces();
 	currentPiece = queuedPieces.shift();
+	currentPiece.init();
 	clearLines();
 }
 
@@ -65,7 +66,9 @@ function resetGame() {
 			board[i][j] = false;
 	queuedPieces = queuePieces();
 	currentPiece = queuedPieces.shift();
+	currentPiece.init();
 	frameCount = 0;
+	if (paused) pauseGame();
 }
 
 function pauseGame() {
@@ -76,9 +79,9 @@ function pauseGame() {
 // To-do: DAS
 function keyPressed() {
 	if (keyCode == 80/*p*/) pauseGame();
+	else if (keyCode == 82/*r*/) resetGame();
 	else if (!paused) {
-		if (keyCode == 82/*r*/) resetGame();
-		else if (keyCode == 32/*SPACE*/) currentPiece.hardDrop();
+		if (keyCode == 32/*SPACE*/) currentPiece.hardDrop();
 		else if (keyCode == 16/*SHIFT*/) currentPiece.rotate(-1);
 		else if (keyCode == UP_ARROW) currentPiece.rotate(1);
 		else if (keyCode == DOWN_ARROW) currentPiece.drop();
