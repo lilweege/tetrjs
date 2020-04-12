@@ -3,6 +3,7 @@ Yet another simple tetris clone in the browser.
 
 * Built using p5.js library for drawing on the canvas.
 * Inspiration comes from http://farter.cn/tetr.js/
+* **Please don't laugh at my spaghetti code, thanks.**
 
 # about
 * Tetris is one of my favorites I revisit from time to time. This one is just a fun little project to keep me occupied for now. I'm surprised I haven't made my own tetris clone until now.
