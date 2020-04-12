@@ -1,12 +1,22 @@
 const scl = 20;
 const w = 10;
 const h = 20;
+let arr = 2;
+let das = 10;
+let dasCnt = 0;
+let drpCnt = 0;
+let keys = {
+	d: false,
+	l: false,
+	r: false
+};
 let rate = 30;
 let board = [...Array(w)].map(e => new Array(h));
 let queuedPieces;
 let currentPiece;
 let paused = false;
 
+// IOTJLSZ
 let colors = [
 	{r:   0, g: 255, b: 255},
 	{r: 255, g: 255, b:   0},
