@@ -1,25 +1,25 @@
 function setup() {
-  createCanvas(w * scl, h * scl);
-  resetGame();
+	createCanvas(w * scl, h * scl);
+	resetGame();
 }
 
 function draw() {
-  for (let i = 0; i < w; i++) {
-    for (let j = 0; j < h; j++) {
-      board[i][j] ? fill(board[i][j].r, board[i][j].g, board[i][j].b) : fill(255);
-      rect(i * scl, j * scl, scl, scl);
-    }
-  }
-  if (frameCount % rate == 0) currentPiece.drop();
-  currentPiece.draw();
+	for (let i = 0; i < w; i++) {
+		for (let j = 0; j < h; j++) {
+			board[i][j] ? fill(board[i][j].r, board[i][j].g, board[i][j].b) : fill(255);
+			rect(i * scl, j * scl, scl, scl);
+		}
+	}
+	if (frameCount % rate == 0) currentPiece.drop();
+	currentPiece.draw();
 }
 
 function place() {
-  for (let block of currentPiece.blocks) {
-    board[currentPiece.x + block.x][currentPiece.y + block.y] = currentPiece.color;
-  }
-  currentPiece = newPiece();
-  clearLines();
+	for (let block of currentPiece.blocks) {
+		board[currentPiece.x + block.x][currentPiece.y + block.y] = currentPiece.color;
+	}
+	currentPiece = newPiece();
+	clearLines();
 }
 
 function newPiece() { // IOTJLSZ
@@ -27,45 +27,45 @@ function newPiece() { // IOTJLSZ
 }
 
 function clearLines() {
-  // determine which lines to clear
-  let toClear = [];
-  for (let j = 0; j < h; j++) {
-    let blocks = 0;
-    for (let i = 0; i < w; i++) {
-      if (board[i][j]) blocks++;
-    }
-    if (blocks == w) toClear.push(j);
-  }
-  
-  // remove lines
-  for (let line of toClear) {
-    for (let i = 0; i < w; i++) {
-      board[i][line] = false;
-    }
-  }
-  
-  // shift down
-  for (let line of toClear) {
-    for (let j = line; j > 0; j--) {
-      for (let i = 0; i < w; i++) {
-        board[i][j] = board[i][j - 1];
-      }
-    }
-  }
+	// determine which lines to clear
+	let toClear = [];
+	for (let j = 0; j < h; j++) {
+		let blocks = 0;
+		for (let i = 0; i < w; i++) {
+			if (board[i][j]) blocks++;
+		}
+		if (blocks == w) toClear.push(j);
+	}
+
+	// remove lines
+	for (let line of toClear) {
+		for (let i = 0; i < w; i++) {
+			board[i][line] = false;
+		}
+	}
+
+	// shift down
+	for (let line of toClear) {
+		for (let j = line; j > 0; j--) {
+			for (let i = 0; i < w; i++) {
+				board[i][j] = board[i][j - 1];
+			}
+		}
+	}
 }
 
 function resetGame() {
 	for (let i = 0; i < w; i++)
-	  for (let j = 0; j < h; j++)
-		board[i][j] = false;
+		for (let j = 0; j < h; j++)
+			board[i][j] = false;
 	currentPiece = newPiece();
 	frameCount = 0;
 }
 
 function pauseGame() {
 	if (paused) loop();
-    else noLoop();
-    paused = !paused;
+	else noLoop();
+	paused = !paused;
 }
 
 // To-do: DAS
