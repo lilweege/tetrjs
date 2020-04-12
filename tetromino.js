@@ -6,15 +6,19 @@ class Tetromino {
 		this.y = 0;
 		this.blocks = [];
 		this.rot = 0;
-		this.rotate(0);
 	}
 
-	tryPlace(x, y) {
+	init() {
+		this.rotate(0);
+		this.move(0);
+	}
+
+	tryPlace(x, y, g) {
 		for (let block of this.blocks) {
 			let nx = x + block.x;
 			let ny = y + block.y;
 			if (ny > h - 1 || board[nx][ny]) {
-				place();
+				if (!g) place();
 				return true;
 			}
 		}
@@ -39,14 +43,28 @@ class Tetromino {
 	}
 
 	move(dx) {
-		if (!this.isWall(this.x + dx, this.y)) this.x += dx;
+		if (!this.isWall(this.x + dx, this.y)) {
+			this.x += dx;
+			this.updateGhost();
+		}
 	}
 
 	draw() {
 		fill(this.color.r, this.color.g, this.color.b);
-		for (let block of this.blocks) {
+		for (let block of this.blocks)
 			rect((this.x + block.x) * scl, (this.y + block.y) * scl, scl, scl);
-		}
+		this.drawGhost();
+	}
+
+	updateGhost() {
+		this.gy = this.y;
+		while (!this.tryPlace(this.x, this.gy + 1, true)) this.gy++;
+	}
+
+	drawGhost() {
+		fill(this.color.r, this.color.g, this.color.b, 127);
+		for (let block of this.blocks)
+			rect((this.x + block.x) * scl, (this.gy + block.y) * scl, scl, scl);
 	}
 
 	rotate(dir) {
@@ -57,6 +75,9 @@ class Tetromino {
 		if (this.isWall(this.x, this.y)) {
 			this.rot = pr;
 			this.blocks = pb;
+		}
+		else {
+			this.updateGhost();
 		}
 	}
 }
