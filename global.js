@@ -3,6 +3,7 @@ const w = 10;
 const h = 20;
 let rate = 30;
 let board = [...Array(w)].map(e => new Array(h));
+let queuedPieces;
 let currentPiece;
 let paused = false;
 

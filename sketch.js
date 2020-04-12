@@ -10,20 +10,30 @@ function draw() {
 			rect(i * scl, j * scl, scl, scl);
 		}
 	}
-	if (frameCount % rate == 0) currentPiece.drop();
+	if (frameCount % rate == 0)
+		currentPiece.drop();
 	currentPiece.draw();
 }
 
 function place() {
-	for (let block of currentPiece.blocks) {
+	for (let block of currentPiece.blocks)
 		board[currentPiece.x + block.x][currentPiece.y + block.y] = currentPiece.color;
-	}
-	currentPiece = newPiece();
+	if (queuedPieces.length == 0)
+		queuedPieces = queuePieces();
+	currentPiece = queuedPieces.shift();
 	clearLines();
 }
 
-function newPiece() { // IOTJLSZ
-	return new Tetromino(Math.floor(Math.random() * 7));
+// IOTJLSZ
+function queuePieces() {
+	q = [];
+	for (let i = 0; i < 7; i++)
+		q.push(new Tetromino(i));
+	return shuff(q);
+}
+
+function shuff(a) {
+	return a.map((a) => ({sort: Math.random(), value: a})).sort((a, b) => a.sort - b.sort).map((a) => a.value);
 }
 
 function clearLines() {
@@ -38,33 +48,28 @@ function clearLines() {
 	}
 
 	// remove lines
-	for (let line of toClear) {
-		for (let i = 0; i < w; i++) {
+	for (let line of toClear)
+		for (let i = 0; i < w; i++)
 			board[i][line] = false;
-		}
-	}
 
 	// shift down
-	for (let line of toClear) {
-		for (let j = line; j > 0; j--) {
-			for (let i = 0; i < w; i++) {
+	for (let line of toClear)
+		for (let j = line; j > 0; j--)
+			for (let i = 0; i < w; i++)
 				board[i][j] = board[i][j - 1];
-			}
-		}
-	}
 }
 
 function resetGame() {
 	for (let i = 0; i < w; i++)
 		for (let j = 0; j < h; j++)
 			board[i][j] = false;
-	currentPiece = newPiece();
+	queuedPieces = queuePieces();
+	currentPiece = queuedPieces.shift();
 	frameCount = 0;
 }
 
 function pauseGame() {
-	if (paused) loop();
-	else noLoop();
+	paused ? loop() : noLoop();
 	paused = !paused;
 }
 
