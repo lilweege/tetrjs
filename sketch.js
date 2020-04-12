@@ -4,28 +4,52 @@ function setup() {
 }
 
 function draw() {
+	drawGrid();
+	updateGame();
+	currentPiece.draw();
+}
+
+function drawGrid() {
 	for (let i = 0; i < w; i++) {
 		for (let j = 0; j < h; j++) {
 			board[i][j] ? fill(board[i][j].r, board[i][j].g, board[i][j].b) : fill(255);
 			rect(i * scl, j * scl, scl, scl);
 		}
 	}
+}
+
+function updateGame() {
+	if (keys.l != keys.r) {
+		if (dasCnt > das && dasCnt % arr == 0) {
+			if (keys.l) currentPiece.move(-1);
+			else if (keys.r) currentPiece.move(1);
+		}
+		dasCnt++;
+	}
+	else dasCnt = 0;
+
 	if (frameCount % rate == 0)
 		currentPiece.drop();
-	currentPiece.draw();
+	else if (keys.d) {
+		if (drpCnt > das && drpCnt % arr == 0) {
+			currentPiece.drop();
+		}
+		drpCnt++;
+	}
+	else drpCnt = 0;
 }
 
 function place() {
 	for (let block of currentPiece.blocks)
 		board[currentPiece.x + block.x][currentPiece.y + block.y] = currentPiece.color;
+	clearLines();
+
 	if (queuedPieces.length == 0)
 		queuedPieces = queuePieces();
 	currentPiece = queuedPieces.shift();
 	currentPiece.init();
-	clearLines();
 }
 
-// IOTJLSZ
 function queuePieces() {
 	q = [];
 	for (let i = 0; i < 7; i++)
@@ -33,8 +57,8 @@ function queuePieces() {
 	return shuff(q);
 }
 
-function shuff(a) {
-	return a.map((a) => ({sort: Math.random(), value: a})).sort((a, b) => a.sort - b.sort).map((a) => a.value);
+function shuff(arr) {
+	return arr.map((a) => ({sort: Math.random(), value: a})).sort((a, b) => a.sort - b.sort).map((a) => a.value);
 }
 
 function clearLines() {
@@ -74,18 +98,47 @@ function resetGame() {
 function pauseGame() {
 	paused ? loop() : noLoop();
 	paused = !paused;
+	if (paused) {
+		keys.d = false;
+		keys.l = false;
+		keys.r = false;
+	}
+}
+function holdPiece() {
+	return;
 }
 
-// To-do: DAS
 function keyPressed() {
 	if (keyCode == 80/*p*/) pauseGame();
 	else if (keyCode == 82/*r*/) resetGame();
 	else if (!paused) {
 		if (keyCode == 32/*SPACE*/) currentPiece.hardDrop();
-		else if (keyCode == 16/*SHIFT*/) currentPiece.rotate(-1);
-		else if (keyCode == UP_ARROW) currentPiece.rotate(1);
-		else if (keyCode == DOWN_ARROW) currentPiece.drop();
-		else if (keyCode == RIGHT_ARROW) currentPiece.move(1);
-		else if (keyCode == LEFT_ARROW) currentPiece.move(-1);
+		else if (keyCode == 90/*z*/) currentPiece.rotate(-1);
+		else if (keyCode == 88/*x*/) currentPiece.rotate( 1);
+		else if (keyCode == UP_ARROW) currentPiece.rotate( 1);
+		else if (keyCode == 67/*c*/) holdPiece();
+		// DAS keys
+		switch (keyCode) {
+			case DOWN_ARROW:
+				keys.d = true;
+				currentPiece.drop();
+				break;
+			case LEFT_ARROW:
+				keys.l = true;
+				currentPiece.move(-1);
+				break;
+			case RIGHT_ARROW:
+				keys.r = true;
+				currentPiece.move( 1);
+				break;
+		}
+	}
+}
+
+function keyReleased() {
+	switch (keyCode) {
+		case DOWN_ARROW: keys.d = false; break;
+		case LEFT_ARROW: keys.l = false; break;
+		case RIGHT_ARROW: keys.r = false; break;
 	}
 }

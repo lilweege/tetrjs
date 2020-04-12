@@ -4,7 +4,6 @@ class Tetromino {
 		this.color = colors[piece];
 		this.x = 4;
 		this.y = 0;
-		this.blocks = [];
 		this.rot = 0;
 	}
 
@@ -29,7 +28,7 @@ class Tetromino {
 		for (let block of this.blocks) {
 			let nx = x + block.x;
 			let ny = y + block.y;
-			if (nx < 0 || nx >= w || board[nx][ny]) return true;
+			if (nx < 0 || nx >= w || ny > h - 1 || board[nx][ny]) return true;
 		}
 		return false;
 	}
