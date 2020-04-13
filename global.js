@@ -2,8 +2,13 @@ const scl = 20;
 const w = 10;
 const s = 4;
 const h = 20;
-let arr = 2;
-let das = 10;
+
+const fr = 30;
+let paused = false;
+let rate = 30;
+
+const arr = 2;
+const das = 5;
 let dasCnt = 0;
 let drpCnt = 0;
 let keys = {
@@ -11,13 +16,14 @@ let keys = {
 	l: false,
 	r: false
 };
-let rate = 30;
+
 let board = [...Array(w)].map(e => new Array(h));
 let queuedPieces;
 let currentPiece;
 let holdingPiece = null;
+let alreadyHeld;
 let nextPiece;
-let paused = false;
+let lines = 0;
 
 // IOTJLSZ
 let colors = [

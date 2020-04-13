@@ -61,7 +61,7 @@ class Tetromino {
 	}
 
 	drawGhost() {
-		fill(this.color.r, this.color.g, this.color.b, 64);
+		fill(this.color.r, this.color.g, this.color.b, 127);
 		for (let block of this.blocks)
 			rect((this.x + block.x) * scl, (this.gy + block.y) * scl, scl, scl);
 	}
