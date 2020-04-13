@@ -1,11 +1,12 @@
 function setup() {
-	createCanvas(w * scl, h * scl);
+	createCanvas(w * scl + s * scl, h * scl);
 	resetGame();
 }
 
 function draw() {
-	drawGrid();
 	updateGame();
+	drawUI();
+	drawGrid();
 	currentPiece.draw();
 }
 
@@ -18,6 +19,20 @@ function drawGrid() {
 	}
 }
 
+function drawUI() {
+	fill(255);
+	rect(w * scl, 0, s * scl, s * scl);
+	nextPiece.draw(true);
+
+	fill(255);
+	rect(w * scl, s * scl, s * scl, s * scl);
+	if (holdingPiece) holdingPiece.draw(true);
+
+	fill(255);
+	rect(w * scl, 2 * s * scl, s * scl, (h - 2 * s) * scl);
+}
+
+
 function updateGame() {
 	if (keys.l != keys.r) {
 		if (dasCnt > das && dasCnt % arr == 0) {
@@ -28,26 +43,25 @@ function updateGame() {
 	}
 	else dasCnt = 0;
 
-	if (frameCount % rate == 0)
-		currentPiece.drop();
-	else if (keys.d) {
+	if (keys.d) {
 		if (drpCnt > das && drpCnt % arr == 0) {
 			currentPiece.drop();
 		}
 		drpCnt++;
 	}
+	else if (frameCount % rate == 0)
+		currentPiece.drop();
 	else drpCnt = 0;
 }
 
 function place() {
-	for (let block of currentPiece.blocks)
-		board[currentPiece.x + block.x][currentPiece.y + block.y] = currentPiece.color;
-	clearLines();
-
-	if (queuedPieces.length == 0)
-		queuedPieces = queuePieces();
-	currentPiece = queuedPieces.shift();
-	currentPiece.init();
+	if (checkLose()) resetGame();
+	else {
+		for (let block of currentPiece.blocks)
+			board[currentPiece.x + block.x][currentPiece.y + block.y] = currentPiece.color;
+		clearLines();
+		getNextPiece();
+	}
 }
 
 function queuePieces() {
@@ -84,53 +98,92 @@ function clearLines() {
 				board[i][j] = board[i][j - 1];
 }
 
+function checkLose() {
+	for (let block of currentPiece.blocks)
+		if (currentPiece.y + block.y <= 1)
+			return true;
+}
+
+function getNextPiece() {
+	currentPiece = queuedPieces.shift();
+	currentPiece.init();
+	if (queuedPieces.length == 0)
+		queuedPieces = queuePieces();
+	nextPiece = queuedPieces[0];
+	nextPiece.init();
+	nextPiece.x = w + 1;
+	nextPiece.y = 1;
+}
+
 function resetGame() {
 	for (let i = 0; i < w; i++)
 		for (let j = 0; j < h; j++)
 			board[i][j] = false;
+
 	queuedPieces = queuePieces();
-	currentPiece = queuedPieces.shift();
-	currentPiece.init();
+	getNextPiece();
+	holdingPiece = null;
+
 	frameCount = 0;
 	if (paused) pauseGame();
 }
 
 function pauseGame() {
-	paused ? loop() : noLoop();
-	paused = !paused;
-	if (paused) {
+	if (!paused) {
+		noLoop();
+		paused = true;
 		keys.d = false;
 		keys.l = false;
 		keys.r = false;
 	}
+	else {
+		loop();
+		paused = false;
+	}
 }
+
 function holdPiece() {
-	return;
+	if (!holdingPiece) {
+		holdingPiece = currentPiece;
+		getNextPiece();
+	}
+	else {
+		let t = currentPiece;
+		currentPiece = holdingPiece;
+		holdingPiece = t;
+		currentPiece.init();
+	}
+	holdingPiece.rotate(-holdingPiece.rot);
+	holdingPiece.x = w + 1;
+	holdingPiece.y = s + 1;
 }
 
 function keyPressed() {
 	if (keyCode == 80/*p*/) pauseGame();
+	else if (keyCode == ESCAPE) pauseGame();
 	else if (keyCode == 82/*r*/) resetGame();
 	else if (!paused) {
 		if (keyCode == 32/*SPACE*/) currentPiece.hardDrop();
 		else if (keyCode == 90/*z*/) currentPiece.rotate(-1);
 		else if (keyCode == 88/*x*/) currentPiece.rotate( 1);
-		else if (keyCode == UP_ARROW) currentPiece.rotate( 1);
+		else if (keyCode == UP_ARROW) currentPiece.rotate(1);
 		else if (keyCode == 67/*c*/) holdPiece();
-		// DAS keys
-		switch (keyCode) {
-			case DOWN_ARROW:
+		else {
+			// DAS keys
+			switch (keyCode) {
+				case DOWN_ARROW:
 				keys.d = true;
 				currentPiece.drop();
 				break;
-			case LEFT_ARROW:
+				case LEFT_ARROW:
 				keys.l = true;
 				currentPiece.move(-1);
 				break;
-			case RIGHT_ARROW:
+				case RIGHT_ARROW:
 				keys.r = true;
 				currentPiece.move( 1);
 				break;
+			}
 		}
 	}
 }
