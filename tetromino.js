@@ -2,12 +2,12 @@ class Tetromino {
 	constructor(piece) {
 		this.piece = piece;
 		this.color = colors[piece];
-		this.x = 4;
-		this.y = 0;
 		this.rot = 0;
 	}
 
 	init() {
+		this.x = 4;
+		this.y = 0;
 		this.rotate(0);
 		this.move(0);
 	}
@@ -48,11 +48,11 @@ class Tetromino {
 		}
 	}
 
-	draw() {
+	draw(ng) {
 		fill(this.color.r, this.color.g, this.color.b);
 		for (let block of this.blocks)
 			rect((this.x + block.x) * scl, (this.y + block.y) * scl, scl, scl);
-		this.drawGhost();
+		if (!ng) this.drawGhost();
 	}
 
 	updateGhost() {
@@ -61,7 +61,7 @@ class Tetromino {
 	}
 
 	drawGhost() {
-		fill(this.color.r, this.color.g, this.color.b, 127);
+		fill(this.color.r, this.color.g, this.color.b, 64);
 		for (let block of this.blocks)
 			rect((this.x + block.x) * scl, (this.gy + block.y) * scl, scl, scl);
 	}
@@ -71,12 +71,11 @@ class Tetromino {
 		let pb = this.blocks;
 		this.rot = ((this.rot + dir) % 4 + 4) % 4
 		this.blocks = blocks[this.piece][this.rot];
+
 		if (this.isWall(this.x, this.y)) {
 			this.rot = pr;
 			this.blocks = pb;
 		}
-		else {
-			this.updateGhost();
-		}
+		else this.updateGhost();
 	}
 }

@@ -1,5 +1,6 @@
 const scl = 20;
 const w = 10;
+const s = 4;
 const h = 20;
 let arr = 2;
 let das = 10;
@@ -14,6 +15,8 @@ let rate = 30;
 let board = [...Array(w)].map(e => new Array(h));
 let queuedPieces;
 let currentPiece;
+let holdingPiece = null;
+let nextPiece;
 let paused = false;
 
 // IOTJLSZ
