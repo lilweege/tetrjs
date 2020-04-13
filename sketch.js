@@ -1,5 +1,6 @@
 function setup() {
 	createCanvas(w * scl + s * scl, h * scl);
+	frameRate(fr);
 	resetGame();
 }
 
@@ -30,6 +31,11 @@ function drawUI() {
 
 	fill(255);
 	rect(w * scl, 2 * s * scl, s * scl, (h - 2 * s) * scl);
+	fill(0);
+	let seconds = Math.floor(frameCount / fr) % 60;
+	let minutes = Math.floor(frameCount / fr / 60);
+	text(`Time: ${(minutes < 10 ? "0" : "") + minutes}:${(seconds < 10 ? "0" : "") + seconds}`, w * scl + scl / 2, (h - 2 * s) * scl);
+	text(`Lines: ${lines}`, w * scl + scl / 2, (h - 2 * s) * scl + scl)
 }
 
 
@@ -61,6 +67,7 @@ function place() {
 			board[currentPiece.x + block.x][currentPiece.y + block.y] = currentPiece.color;
 		clearLines();
 		getNextPiece();
+		alreadyHeld = false;
 	}
 }
 
@@ -83,7 +90,10 @@ function clearLines() {
 		for (let i = 0; i < w; i++) {
 			if (board[i][j]) blocks++;
 		}
-		if (blocks == w) toClear.push(j);
+		if (blocks == w) {
+			toClear.push(j);
+			lines++;
+		}
 	}
 
 	// remove lines
@@ -125,6 +135,8 @@ function resetGame() {
 	holdingPiece = null;
 
 	frameCount = 0;
+	lines = 0;
+	alreadyHeld = false;
 	if (paused) pauseGame();
 }
 
@@ -143,19 +155,22 @@ function pauseGame() {
 }
 
 function holdPiece() {
-	if (!holdingPiece) {
-		holdingPiece = currentPiece;
-		getNextPiece();
+	if (!alreadyHeld) {
+		if (!holdingPiece) {
+			holdingPiece = currentPiece;
+			getNextPiece();
+		}
+		else {
+			let t = currentPiece;
+			currentPiece = holdingPiece;
+			holdingPiece = t;
+			currentPiece.init();
+		}
+		holdingPiece.rotate(-holdingPiece.rot);
+		holdingPiece.x = w + 1;
+		holdingPiece.y = s + 1;
+		alreadyHeld = true;
 	}
-	else {
-		let t = currentPiece;
-		currentPiece = holdingPiece;
-		holdingPiece = t;
-		currentPiece.init();
-	}
-	holdingPiece.rotate(-holdingPiece.rot);
-	holdingPiece.x = w + 1;
-	holdingPiece.y = s + 1;
 }
 
 function keyPressed() {
@@ -172,17 +187,17 @@ function keyPressed() {
 			// DAS keys
 			switch (keyCode) {
 				case DOWN_ARROW:
-				keys.d = true;
-				currentPiece.drop();
-				break;
+					keys.d = true;
+					currentPiece.drop();
+					break;
 				case LEFT_ARROW:
-				keys.l = true;
-				currentPiece.move(-1);
-				break;
+					keys.l = true;
+					currentPiece.move(-1);
+					break;
 				case RIGHT_ARROW:
-				keys.r = true;
-				currentPiece.move( 1);
-				break;
+					keys.r = true;
+					currentPiece.move( 1);
+					break;
 			}
 		}
 	}
